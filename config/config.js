@@ -6,9 +6,21 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const mnemonic_path= "config/secret/mnemonic"
-const mnemonics = fs.readFileSync(mnemonic_path, 'utf8').trim().split('\n');
-console.log("==================================================================")
-console.log(`faucet mnemonic: ${mnemonics[0].substring(1, 15)} ...`)
+let mnemonics;
+try {
+    mnemonics = fs.readFileSync(mnemonic_path, 'utf8').trim().split('\n');
+    if (mnemonics.length === 0) throw new Error("Mnemonic file is empty");
+} catch (err) {
+    console.error(`Error reading mnemonics from ${mnemonic_path}:`, err);
+    process.exit(1);
+}
+
+console.log("==================================================================");
+if (mnemonics[0].length >= 15) {
+    console.log(`faucet mnemonic: ${mnemonics[0].substring(1, 15)} ...`);
+} else {
+    console.log(`faucet mnemonic: ${mnemonics[0]} ...`);
+}
 
 export default {
 
