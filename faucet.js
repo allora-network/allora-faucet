@@ -20,6 +20,7 @@ const app = express()
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static('static'));
 
 app.set("view engine", "ejs");
 
@@ -138,6 +139,11 @@ const ipCounter = new Map();
 const TIME_WINDOW = 60000; // 1 minute in milliseconds
 const MAX_REQUESTS = 3; // Threshold for blocklisting
 
+// API key rate limiting
+const apiKeyCounter = new Map();
+const API_KEY_TIME_WINDOW = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const MAX_API_KEY_REQUESTS = 3; // Maximum requests per API key per day
+
 const checkIpBlockList = async (ip) => {
     const [firstOctet, secondOctet] = ip.split('.');
     const ipPrefix = `${firstOctet}.${secondOctet}`;
@@ -172,6 +178,108 @@ const checkIpBlockList = async (ip) => {
 
     return false
 };
+
+const checkApiKeyRateLimit = async (apiKey) => {
+    const now = Date.now();
+    
+    // Check and update API key counter
+    if (!apiKeyCounter.has(apiKey)) {
+        apiKeyCounter.set(apiKey, []);
+    }
+    
+    const timestamps = apiKeyCounter.get(apiKey);
+    
+    // Remove timestamps older than 24 hours
+    while (timestamps.length > 0 && now - timestamps[0] > API_KEY_TIME_WINDOW) {
+        timestamps.shift();
+    }
+    
+    // Check if API key has exceeded daily limit
+    if (timestamps.length >= MAX_API_KEY_REQUESTS) {
+        return false; // Rate limit exceeded
+    }
+    
+    // Add current timestamp
+    timestamps.push(now);
+    apiKeyCounter.set(apiKey, timestamps);
+    
+    return true; // Request allowed
+};
+
+app.post('/api/send', async (req, res, next) => {
+  return Promise.resolve().then(async () => {
+    const {chain, address} = req.body;
+    const apiKey = req.headers['x-api-key'];
+    
+    // Check for API key header - if present, skip captcha
+    if (!apiKey) {
+      return res.status(401).json({ code: 1, message: 'API key required' });
+    }
+    
+    // Check API key rate limit (3 requests per day)
+    const rateLimitAllowed = await checkApiKeyRateLimit(apiKey);
+    if (!rateLimitAllowed) {
+      return res.status(429).json({ 
+        code: 1, 
+        message: `API key rate limit exceeded. Maximum ${MAX_API_KEY_REQUESTS} requests per 24 hours.` 
+      });
+    }
+    
+    // Optional: Add API key validation here if needed
+    // if (apiKey !== conf.apiKey) {
+    //   return res.status(401).json({ code: 1, message: 'Invalid API key' });
+    // }
+
+    // Process request
+    const ip = req.headers['x-real-ip'] || req.headers['X-Real-IP'] || req.headers['X-Forwarded-For'] || req.ip
+    console.log('request tokens to ', address, ip)
+    if (chain || address ) {
+      // try {
+        const chainConf = conf.blockchains.find(x => x.name === chain)
+        if (chainConf && (address.startsWith(chainConf.sender.option.prefix) || address.startsWith('0x'))) {
+          if( await checker.checkAddress(address, chain) && await checker.checkIp(`${chain}${ip}`, chain) ) {
+            checker.update(`${chain}${ip}`) // get ::1 on localhost
+
+            const statusAddress = `status:${address}`;
+            if (addressStatus[statusAddress] === 'Completed') {
+              addressStatus[statusAddress] = 'cleared';
+              return res.status(201).json({ code: 0, message: 'Your previous faucet request has been processed. You can now submit a new request.' });
+            }
+
+            if (queue.includes(statusAddress)) {
+              console.log('Address already in queue');
+              return res.status(200).json({ code: 0, message: 'Address already in the processing queue' });
+            }
+
+            const ipBlocked = await checkIpBlockList(ip);
+            if (ipBlocked) {
+              console.log(`IP blocked - ${ip}`);
+              res.status(403).json({ code: 1, message: `IP added to blocklist.`});
+            } else {
+              await enqueueAddress(statusAddress);
+              res.status(201).json({ code: 0, message: 'Address enqueued for faucet processing.' });
+            }
+
+            await checker.update(address)
+
+          }else {
+            res.status(429).send({ code: 1, message: `Too many faucet requests sent for address '${address}'. Try again later.
+              \nLimits per 24h: ${chainConf.limit.address} times per address, ${chainConf.limit.ip} times per IP.
+            `})
+          }
+        } else {
+          res.status(400).send({ code: 1, message: `Address '${address}' is not supported.`, recipient: address })
+        }
+      // } catch (err) {
+      //   console.error(err);
+      //   res.send({ result: 'Failed, Please contact to admin.' })
+      // }
+
+    } else {
+      // send result
+      res.status(400).send({ code: 0, message: 'address is required' });
+    }}).catch(next)
+})
 
 app.post('/send', async (req, res, next) => {
   return Promise.resolve().then(async () => {
@@ -238,7 +346,7 @@ app.post('/send', async (req, res, next) => {
 
 // 500 - Any server error
 app.use((err, req, res) => {
-  console.log("\nError catched by error middleware:", err.stack)
+  console.log("\nError caught by middleware:", err, err.stack)
 })
 
 app.listen(conf.port, () => {

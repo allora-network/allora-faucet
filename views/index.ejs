@@ -3,36 +3,196 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Faucet for Cosmos SDK Blockchain</title>
+    <title>Allora Network - Testnet Faucet</title>
     <link rel="icon" href="https://s3.amazonaws.com/assets.allora.network/favicon.ico" />
     <meta name=”robots” content="index, follow">
-    <meta name="description" content="Uniform Faucet Tool For Cosmos SDK Blockchains - Powered By Ping.pub">
+    <meta name="description" content="Allora Network - Testnet Faucet">
     <link rel="preconnect" href="https://www.google.com">
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     <meta></head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+    <style>
+        .black-bg {
+            background: black;
+        }
+
+        .black-bg:hover {
+            background: #555;
+            color: white;
+        }
+
+        .sans-serif {
+            font-family: Consolas, 'Courier New', monospace;
+        }
+
+        .white {
+            color: white;
+        }
+
+        .black {
+            color: black;
+        }
+
+        .roboto-allora {
+          font-family: "Roboto", sans-serif;
+          font-optical-sizing: auto;
+          font-weight: <weight>;
+          font-style: normal;
+          font-variation-settings:
+            "wdth" 100;
+        }
+
+        .bg {
+            z-index: -1;
+            opacity: .15;
+            position: absolute;
+            inset: auto auto 0%;
+        }
+
+        .footer-dark {
+            background-color: white;
+            font-size: 1rem;
+            line-height: 1.5;
+            box-sizing: border-box;
+            display: block;
+            border-top: 1px solid #0000004d;
+            border-bottom: 1px solid #e4ebf3;
+            padding: 4rem 0 1rem;
+            position: relative;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 87.5rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .div-block-4 {
+            border-top: 1px solid #00000024;
+            width: 95%;
+            margin-top: 30px;
+            margin-left: auto;
+            margin-right: auto;
+            padding-top: 30px;
+        }
+
+        .div-block-3 {
+            grid-column-gap: 20px;
+            grid-row-gap: 20px;
+            flex-flow: column;
+            display: flex;
+        }
+
+        .footer-copyright-center-2 {
+            text-align: center;
+            font-size: 14px;
+            line-height: 16px;
+        }
+
+        .footer-wrapper {
+            grid-column-gap: 130px;
+            grid-row-gap: 130px;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 90%;
+            max-width: 84.375rem;
+            margin-left: 0;
+            margin-right: auto;
+            display: flex;
+        }
+
+        .footer-content {
+            grid-column-gap: 40px;
+            grid-row-gap: 40px;
+            grid-template-rows: auto;
+            grid-template-columns: auto auto 2fr;
+            grid-auto-columns: 1fr;
+            display: grid;
+        }
+
+        .footer-content div {
+            grid-area: span 1 / span 1 / span 1 / span 1;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            width: 100px;
+            display: flex;
+        }
+
+        .title-small {
+            letter-spacing: 1px;
+            text-transform: none;
+            margin-bottom: 12px;
+            font-size: 1.125rem;
+            font-weight: 500;
+            line-height: 16px;
+        }
+
+        .footer-link-2 {
+            color: #0c0c0cb3;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            font-size: 1rem;
+            line-height: 16px;
+            text-decoration: none;
+            transition: all .2s;
+        }
+
+        .footer-link-2:hover {
+            color: #0c0c0c;
+        }
+
+        .image-13 {
+            width: 120px;
+        }
+
+        .text-size-large-2.fotter {
+            opacity: .9;
+            width: 70%;
+            font-size: .9rem;
+        }
+
+        .text-size-large-2 {
+            color: #0c0c0c;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+/*            justify-content: space-between;*/
+        }
+
+        .spacer {
+            flex-grow: 1;
+        }
+    </style>
   </head>
-  <body>
+  <body class="roboto-allora">
     <div id="app">
       <main class="container-md">
         <div class="py-5 text-center">
-          <img id="logo" class="d-block mx-auto mb-4" style="max-width: 250px;" src="<%= project.logo %>" :alt="`${testnet} Faucet`">
+          <img id="logo" class="d-block mx-auto mb-4" style="max-width: 250px;" src="/logo.svg" :alt="`${testnet} Faucet`">
           <h1><%= project.name %></h1>
-          <p class="lead">Dear, Cosmonauts! <br>
-              Welcome to <%= project.name %>! Are you looking for some tokens to start? 
-          </p>
         </div>
         <div class="row g-5">
           <div class="d-flex flex-column">
             <div class="input-group">
                 <span class="input-group-text">
-                  <select v-model="chain" @change="onChange()">
+                  <select style="display: none" v-model="chain" @change="onChange()">
                     <option v-for="c in conf.blockchains">{{c}}</option>
                   </select>
                 </span>
                 <input id="address" class="form-control" :placeholder="addressPlaceholder" v-model="address" name="address">
-                <button id="tokens-request-button" type="button" class="btn btn-secondary d-flex flex-row" @click="validateReCaptcha">
+                <button id="tokens-request-button" type="button" class="black-bg white btn d-flex flex-row" @click="validateReCaptcha">
                   <span>
                     <span id="address-button-loading" class="spinner-border spinner-border-sm mt-1 mr-1" style="display:none" role="status" aria-hidden="true"></span>
                   </span>
@@ -46,18 +206,27 @@
         <div id="recaptcha" class="g-recaptcha"></div>
       </main>
     
-      <footer class="my-5 pt-5 text-muted text-center text-small">
+      <div class="my-5 pt-5 text-muted text-center text-small">
         <div class="my-2">
-          <div v-for="balance in balances" :key="balance.address">
-            <p>Faucet Address: {{ balance.address }}, <br> Balance: {{ balance.balance.amount }} {{ balance.balance.denom }}</p>
+          <div v-for="balance in formattedBalances" :key="balance.address">
+            <p class="black">
+                <strong>Faucet Address:</strong> <span class="sans-serif">{{ balance.address }}</span>
+                <br>
+                <strong>Balance:</strong> <span class="sans-serif">{{ balance.balance.amount }} {{ balance.balance.denom }}</span>
+            </p>
           </div>
         </div>
-        <p class="mb-1">&copy; 2024 Deployed By <%- project.deployer%></p>
-        <ul class="list-inline">
-          <li class="list-inline-item"><a href="https://github.com/ping-pub/faucet.git">Deploy a new instance?</a></li>
-        </ul>
-      </footer>
+      </div>
+
+      <div class="spacer"></div>
+
+      <div class="last">
+          <img class="bg" sizes="100vw" srcset="https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%2520(1)%25201-p-500.png 500w, https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%2520(1)%25201-p-800.png 800w, https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%2520(1)%25201-p-1080.png 1080w, https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%2520(1)%25201-p-1600.png 1600w, https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%2520(1)%25201-p-2000.png 2000w, https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%2520(1)%25201-p-2600.png 2600w, https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%2520(1)%25201-p-3200.png 3200w, https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%20(1)%201.png 8192w" alt="" src="https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355339d_Rectangle%20(1)%201.png" loading="lazy" class="section-backgorund">
+          <section class="footer-dark"><div class="container"><div class="footer-wrapper"><div class="footer-brand-2"><div class="div-block-3"><img loading="lazy" src="https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/68192cc7079cfe117355337e_Group%202358%20(1).svg" alt="" class="image-13"><div class="text-size-large-2 fotter">Allora is a self-improving, decentralized AI network that harnesses community-built machine learning models for highly accurate, context-aware predictions.</div></div></div><div class="footer-content"><div id="w-node-_0afbac4b-19ea-b41a-6fe4-37d097892eab-fdb7e835" class="footer-block"><div class="title-small">Resources</div><a href="https://www.allora.network/blog" class="footer-link-2">Blog</a><a href="https://docs.allora.network/" class="footer-link-2" target="_blank" rel="noopener noreferrer">Docs</a><a href="https://research.assets.allora.network/allora.0x10001.pdf" class="footer-link-2" target="_blank" rel="noopener noreferrer">Whitepaper</a></div><div id="w-node-_0afbac4b-19ea-b41a-6fe4-37d097892eb4-fdb7e835" class="footer-block"><div class="title-small">Company</div><a href="https://alloralabs.bamboohr.com/careers" class="footer-link-2" target="_blank" rel="noopener noreferrer">Careers</a><a href="https://tmcds.notion.site/Allora-Public-Brand-Guidelines-9ae91392698d436b914f1be3b40c6394" class="footer-link-2" target="_blank" rel="noopener noreferrer">Brand Kit</a><a href="https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/6710d9d9cc8214007402e37c_Allora%20Foundation%20-%20Privacy%20Policy%20(Final%2010.15.2024).docx.pdf" class="footer-link-2" target="_blank" rel="noopener noreferrer">Privacy</a><a href="https://cdn.prod.website-files.com/667c44f051907593fdb7e7fe/66abe6695a33981ae66ab3be_Allora%20Foundation%20-%20Terms%20of%20Service.docx.pdf" class="footer-link-2" target="_blank" rel="noopener noreferrer">Terms</a></div><div id="w-node-_0afbac4b-19ea-b41a-6fe4-37d097892ebf-fdb7e835" class="footer-block"><div class="title-small">Connect</div><a href="https://www.allora.network/contact-us" class="footer-link-2">Contact Us</a><a href="https://github.com/allora-network" class="footer-link-2" target="_blank" rel="noopener noreferrer">Github</a><a href="https://discord.com/invite/allora" class="footer-link-2" target="_blank" rel="noopener noreferrer">Discord</a><a href="https://t.me/alloranetworkannouncements" class="footer-link-2" target="_blank" rel="noopener noreferrer">Telegram</a><a href="https://x.com/AlloraNetwork" class="footer-link-2" target="_blank" rel="noopener noreferrer">Twitter</a></div></div></div></div><div class="div-block-4"><div class="footer-copyright-center-2">©2025 ALLORA. ALL RIGHTS RESERVED.</div></div></section>
+      </div>
+
     </div>
+
     <script type="module">
       import { createApp } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 
@@ -82,7 +251,7 @@
             this.conf = data
             this.chain = data.blockchains[0]
             this.reCapchaSiteKey = data.reCaptchaSiteKey
-            // this.placeholder = `Input an address (e.g.: ${data.sample[this.chain]}) to received tokens`
+            // this.placeholder = `Input an address (e.g.: ${data.sample[this.chain]}) to receive tokens`
             this.onChange();
           });
         },
@@ -92,9 +261,9 @@
         computed: {
           addressPlaceholder() {
             if(this.conf.sample) {
-              return `Input an address (e.g.: ${this.conf.sample[this.chain][0]}) to received tokens`
+              return `Input an address (e.g.: ${this.conf.sample[this.chain][0]}) to receive tokens`
             } else {
-              return 'Input an address to received tokens'
+              return 'Input an address to receive tokens'
             }
           },
           addressRequestPlaceholder() {
@@ -102,6 +271,31 @@
           },
           faucet() {
             return this.conf.sample ? this.conf.sample[this.chain] : []
+          },
+          formattedBalances() {
+            return this.balances.map(balance => {
+              let amount = balance.balance.amount;
+              let denom = balance.balance.denom;
+              
+              // Convert uallo to allo (18 decimal places) and truncate to 2 decimal places
+              if (denom === 'uallo') {
+                amount = (parseFloat(amount) / Math.pow(10, 18)).toFixed(2);
+                denom = 'allo';
+              }
+              
+              // Add commas every 3 digits
+              const parts = amount.split('.');
+              parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+              const formattedAmount = parts.join('.');
+              
+              return {
+                address: balance.address,
+                balance: {
+                  amount: formattedAmount,
+                  denom: denom
+                }
+              };
+            });
           }
         },
         methods: {
@@ -209,7 +403,6 @@
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
-    <script>
-    </script>
+
   </body>
 </html>

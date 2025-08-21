@@ -17,7 +17,7 @@ export default {
         "path": `./faucet.db` // db for frequency checker(WIP)
     },
     "project": {
-        "name": "Allora Testnet", // What ever you want, recommend: chain-id, 
+        "name": "Testnet Faucet", // What ever you want, recommend: chain-id,
         "logo": "https://s3.amazonaws.com/assets.allora.network/logo.svg",
         "deployer": '<a href="https://allora.network">Allora</a>'
     },
@@ -27,7 +27,7 @@ export default {
         endpoint: {
             // make sure that CORS is enabled in rpc section in config.toml
             // cors_allowed_origins = ["*"]
-            rpc_endpoint: "https://allora-rpc.testnet-1.testnet.allora.network/",
+            rpc_endpoint: "https://allora-rpc.testnet.allora.network/",
         },
         sender: {
             mnemonics,
