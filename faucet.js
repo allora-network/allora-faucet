@@ -206,19 +206,21 @@ const checkApiKeyRateLimit = async (apiKey) => {
     return true; // Request allowed
 };
 
-app.post('/api/send', async (req, res, next) => {
-  return Promise.resolve().then(async () => {
+app.post('/api/request', async (req, res, next) => {
+  try {
     const {chain, address} = req.body;
     const apiKey = req.headers['x-api-key'];
     
     // Check for API key header - if present, skip captcha
     if (!apiKey) {
+        console.log('api key missing')
       return res.status(401).json({ code: 1, message: 'API key required' });
     }
     
     // Check API key rate limit (3 requests per day)
     const rateLimitAllowed = await checkApiKeyRateLimit(apiKey);
     if (!rateLimitAllowed) {
+        console.log('rate limit')
       return res.status(429).json({ 
         code: 1, 
         message: `API key rate limit exceeded. Maximum ${MAX_API_KEY_REQUESTS} requests per 24 hours.` 
@@ -243,10 +245,12 @@ app.post('/api/send', async (req, res, next) => {
             const statusAddress = `status:${address}`;
             if (addressStatus[statusAddress] === 'Completed') {
               addressStatus[statusAddress] = 'cleared';
+                console.log('cleared')
               return res.status(201).json({ code: 0, message: 'Your previous faucet request has been processed. You can now submit a new request.' });
             }
 
             if (queue.includes(statusAddress)) {
+                console.log('already in queue')
               console.log('Address already in queue');
               return res.status(200).json({ code: 0, message: 'Address already in the processing queue' });
             }
@@ -254,21 +258,23 @@ app.post('/api/send', async (req, res, next) => {
             const ipBlocked = await checkIpBlockList(ip);
             if (ipBlocked) {
               console.log(`IP blocked - ${ip}`);
-              res.status(403).json({ code: 1, message: `IP added to blocklist.`});
-            } else {
-              await enqueueAddress(statusAddress);
-              res.status(201).json({ code: 0, message: 'Address enqueued for faucet processing.' });
+              return res.status(403).json({ code: 1, message: `IP added to blocklist.`});
             }
-
+            
+            await enqueueAddress(statusAddress);
+            console.log('address enqueued')
             await checker.update(address)
+            return res.status(201).json({ code: 0, message: 'Address enqueued for faucet processing.' });
 
           }else {
-            res.status(429).send({ code: 1, message: `Too many faucet requests sent for address '${address}'. Try again later.
+            console.log('2 many requests')
+            return res.status(429).json({ code: 1, message: `Too many faucet requests sent for address '${address}'. Try again later.
               \nLimits per 24h: ${chainConf.limit.address} times per address, ${chainConf.limit.ip} times per IP.
             `})
           }
         } else {
-          res.status(400).send({ code: 1, message: `Address '${address}' is not supported.`, recipient: address })
+          console.log('address not supported')
+          return res.status(400).json({ code: 1, message: `Address '${address}' is not supported.`, recipient: address })
         }
       // } catch (err) {
       //   console.error(err);
@@ -277,8 +283,13 @@ app.post('/api/send', async (req, res, next) => {
 
     } else {
       // send result
-      res.status(400).send({ code: 0, message: 'address is required' });
-    }}).catch(next)
+      console.log('addy required')
+      return res.status(400).json({ code: 0, message: 'address is required' });
+    }
+  } catch (error) {
+    console.error('API send error:', error);
+    return res.status(500).json({ code: 1, message: 'Internal server error' });
+  }
 })
 
 app.post('/send', async (req, res, next) => {
@@ -345,8 +356,11 @@ app.post('/send', async (req, res, next) => {
 })
 
 // 500 - Any server error
-app.use((err, req, res) => {
-  console.log("\nError caught by middleware:", err, err.stack)
+app.use((err, req, res, next) => {
+  console.log("\nError caught by middleware:", err);
+  if (!res.headersSent) {
+    res.status(500).json({ code: 1, message: 'Internal server error' });
+  }
 })
 
 app.listen(conf.port, () => {
