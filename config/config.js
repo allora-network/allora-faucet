@@ -38,7 +38,7 @@ export default {
         },
         tx: {
             amount: [
-            { denom: "uallo", amount: "1000000000" },
+            { denom: "uallo", amount: "1000000000000" },
             ],
             fee: {
                 amount: [{ denom: "uallo", amount: "500" }],
