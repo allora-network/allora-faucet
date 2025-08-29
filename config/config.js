@@ -6,7 +6,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const mnemonic_path= "config/secret/mnemonic"
-const mnemonics = fs.readFileSync(mnemonic_path, 'utf8').trim().split('\n');
+const mnemonics = [ fs.readFileSync(mnemonic_path, 'utf8').trim().split('\n')[0] ];
 console.log("==================================================================")
 console.log(`faucet mnemonic: ${mnemonics[0].substring(1, 15)} ...`)
 
